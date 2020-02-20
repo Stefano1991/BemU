@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class HeroScript : MonoBehaviour
+public class Hero : MonoBehaviour
 {
 
     public Animator baseAnim;
