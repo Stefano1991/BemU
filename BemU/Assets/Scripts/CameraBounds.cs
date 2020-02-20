@@ -17,6 +17,10 @@ public class CameraBounds : MonoBehaviour
 
     public Transform cameraRoot;
 
+    public Transform leftBounds;
+    public Transform rightBounds;
+
+
     // Start is called before the first frame update
     void Start()
     {
@@ -26,6 +30,15 @@ public class CameraBounds : MonoBehaviour
 
         minValue = minVisibleX + cameraHalfWidth;
         maxValue = maxVisibleX - cameraHalfWidth;
+
+        Vector3 position;
+        position = leftBounds.localPosition;
+        position.x = transform.localPosition.x - cameraHalfWidth;
+        leftBounds.localPosition = position;
+
+        position = rightBounds.localPosition;
+        position.x = transform.localPosition.x + cameraHalfWidth;
+        rightBounds.localPosition = position;
     }
 
     public void SetXPosition(float x)
