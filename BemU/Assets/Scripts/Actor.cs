@@ -8,6 +8,7 @@ public class Actor : MonoBehaviour
     public Animator baseAnim;
     public Rigidbody body;
     public SpriteRenderer shadowSprite;
+    public SpriteRenderer baseSprite;
 
     public float speed = 2;
 
