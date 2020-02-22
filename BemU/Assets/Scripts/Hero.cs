@@ -2,40 +2,36 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Hero : MonoBehaviour
+public class Hero : Actor
 {
 
-    public Animator baseAnim;
-    public Rigidbody body;
-    public SpriteRenderer shadowSprite;
+    public InputHandler input;
 
-    public float speed = 2;
     public float walkSpeed = 2;
     public float runSpeed = 5f;
 
-    bool isRunning;
+    public bool isRunning;
     bool isMoving;
     float lastWalk;
     public bool canRun = true;
     float tapAgainToRunTime = 0.2f;
     Vector3 lastWalkVector;
 
-
     Vector3 currentDir;
     bool isFacingLeft;
-    protected Vector3 frontVector;
-
 
     bool isJumpLandAnim;
     bool isJumpingAnim;
-
-    public InputHandler input;
 
     public float jumpForce = 1750f;
     public float jumpDuration = 0.2f;
     public float lastJumpTime;
 
-    public bool isGrounded;
+
+    bool isAttackingAnim;
+    float lastAttackTime;
+    float attackLimit = 0.14f;
+
 
     // Start is called before the first frame update
     void Start()
@@ -44,54 +40,65 @@ public class Hero : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    public override void Update()
     {
+        base.Update();
 
+        isAttackingAnim = baseAnim.GetCurrentAnimatorStateInfo(0).IsName("attack1");
         isJumpLandAnim = baseAnim.GetCurrentAnimatorStateInfo(0).IsName("jump_land");
         isJumpingAnim = baseAnim.GetCurrentAnimatorStateInfo(0).IsName("jump_rise") || baseAnim.GetCurrentAnimatorStateInfo(0).IsName("jump_fall");
 
+
+
         float h = input.GetHorizontalAxis();
         float v = input.GetVerticalAxis();
-
         bool jump = input.GetJumpButtonDown();
-
+        bool attack = input.GetAttackButtonDown();
 
         currentDir = new Vector3(h, 0, v);
         currentDir.Normalize();
 
-        if (v == 0 && h == 0)
-        {
-            Stop();
-            isMoving = false;
-        } else if (!isMoving && (v != 0 || h != 0))
-        {
-            isMoving = true;
-            float dotProduct = Vector3.Dot(currentDir, lastWalkVector);
-            
-            if(canRun && Time.time < lastWalk + tapAgainToRunTime && dotProduct > 0)
-            {
-                Run();
-            } else
-            {
-                Walk();
 
-                if(h != 0)
+        if (!isAttackingAnim)
+        {
+            if (v == 0 && h == 0)
+            {
+                Stop();
+                isMoving = false;
+            }
+            else if (!isMoving && (v != 0 || h != 0))
+            {
+                isMoving = true;
+                float dotProduct = Vector3.Dot(currentDir, lastWalkVector);
+
+                if (canRun && Time.time < lastWalk + tapAgainToRunTime && dotProduct > 0)
                 {
-                    lastWalkVector = currentDir;
-                    lastWalk = Time.time;
+                    Run();
+                }
+                else
+                {
+                    Walk();
+
+                    if (h != 0)
+                    {
+                        lastWalkVector = currentDir;
+                        lastWalk = Time.time;
+                    }
                 }
             }
         }
 
-        if (jump && !isJumpLandAnim && (isGrounded || (isJumpingAnim && Time.time < lastJumpTime +jumpDuration)))
+        if(jump && !isJumpLandAnim && !isAttackingAnim && (isGrounded || (isJumpingAnim && Time.time < lastJumpTime + jumpDuration)))
         {
             Jump(currentDir);
         }
 
+        if(attack && Time.time >= lastAttackTime + attackLimit)
+        {
+            lastAttackTime = Time.time;
+            Attack();
+        }
 
-        Vector3 shadowSpritePosition = shadowSprite.transform.position;
-        shadowSpritePosition.y = 0;
-        shadowSprite.transform.position = shadowSpritePosition;
     }
 
     public void Stop()
@@ -116,47 +123,33 @@ public class Hero : MonoBehaviour
         baseAnim.SetFloat("Speed", speed);
     }
 
-    void Jump(Vector3 direction)
+    public void Jump(Vector3 direction)
     {
-        if (!isJumpingAnim) {     baseAnim.SetTrigger ("Jump");
+        if(!isJumpingAnim)
+        {
+            baseAnim.SetTrigger("Jump");
             lastJumpTime = Time.time;
- 
-            Vector3 horizontalVector = new Vector3(direction.x, 0, direction.z) * speed * 40;
-            body.AddForce(horizontalVector,ForceMode.Force);
+
+            Vector3 horizontalVector = new Vector3(direction.x, 0, direction.z) * speed * 40f;
+            body.AddForce(horizontalVector, ForceMode.Force);
         }
+
         Vector3 verticalVector = Vector3.up * jumpForce * Time.deltaTime;
-        body.AddForce(verticalVector,ForceMode.Force); 
+        body.AddForce(verticalVector, ForceMode.Force);
     }
 
-
-    void OnCollisionEnter(Collision collision) {
-        if (collision.collider.name == "Floor")
-        {
-            isGrounded = true;
-            baseAnim.SetBool("isGrounded", isGrounded);
-            DidLand();
-        }
-    }
-
-    void OnCollisionExit(Collision collision)
+    protected override void DidLand()
     {
-        if (collision.collider.name == "Floor")
-        {
-            isGrounded = false;
-            baseAnim.SetBool("isGrounded", isGrounded);
-        }
-    } 
-
-    void DidLand()
-    {
+        base.DidLand();
         Walk();
+        Run();
     }
 
     private void FixedUpdate()
     {
         Vector3 moveVector = currentDir * speed;
 
-        if (isGrounded)
+        if (isGrounded && !isAttackingAnim)
         {
             body.MovePosition(transform.position + moveVector * Time.fixedDeltaTime);
             baseAnim.SetFloat("Speed", moveVector.magnitude);
@@ -172,17 +165,14 @@ public class Hero : MonoBehaviour
         }
     }
 
-
-    public void FlipSprite(bool isFacingLeft)
+    public override void Attack()
     {
-        if(isFacingLeft)
-        {
-            frontVector = new Vector3(-1, 0, 0);
-            transform.localScale = new Vector3(-1, 1, 1);
-        } else
-        {
-            frontVector = new Vector3(1, 0, 0);
-            transform.localScale = new Vector3(1, 1, 1);
-        }
+        baseAnim.SetInteger("EvaluatedChain", 0);
+        baseAnim.SetInteger("CurrentChain", 1);
+    }
+
+    public void DidChain(int chain)
+    {
+        baseAnim.SetInteger("EvaluatedChain", 1);
     }
 }

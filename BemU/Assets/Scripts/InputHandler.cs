@@ -13,6 +13,7 @@ public class InputHandler : MonoBehaviour
     bool isJumping;
     public float maxJumpDuration = 0.2f;
 
+    bool attack;
 
     public float GetVerticalAxis()
     {
@@ -26,6 +27,10 @@ public class InputHandler : MonoBehaviour
     {
         return jump;
     }
+    public bool GetAttackButtonDown()
+    {
+        return attack;
+    }
 
 
     // Update is called once per frame
@@ -33,6 +38,7 @@ public class InputHandler : MonoBehaviour
     {
         horizontal = Input.GetAxis("Horizontal");
         vertical = Input.GetAxis("Vertical");
+        attack = Input.GetButtonDown("Attack");
 
         if(!jump && !isJumping && Input.GetButton("Jump"))
         {
