@@ -5,11 +5,13 @@ using UnityEngine;
 public class Actor : MonoBehaviour
 {
     public bool isAlive = true;
+
     [Space(15)]
     public Animator baseAnim;
     public Rigidbody body;
     public SpriteRenderer shadowSprite;
     public SpriteRenderer baseSprite;
+
 
     [Space(15)]
     public float maxLife = 100.0f;
@@ -26,6 +28,11 @@ public class Actor : MonoBehaviour
     public bool CanBeHit()
     {
         return isAlive;
+    }
+
+    public bool CanWalk()
+    {
+        return true;
     }
 
 
@@ -144,5 +151,8 @@ public class Actor : MonoBehaviour
     protected virtual void HitActor(Actor actor, Vector3 hitPoint, Vector3 hitVector)
     {
         actor.TakeDamage(10,hitVector);
-    }
+    }   
 }
+
+
+
