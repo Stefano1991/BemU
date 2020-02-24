@@ -225,6 +225,7 @@ GameObject:
   - component: {fileID: 152624348}
   - component: {fileID: 152624347}
   - component: {fileID: 152624350}
+  - component: {fileID: 152624351}
   - component: {fileID: 152624346}
   - component: {fileID: 152624345}
   - component: {fileID: 152624349}
@@ -285,6 +286,9 @@ MonoBehaviour:
   currentLife: 0
   speed: 2
   isGrounded: 0
+  walker: {fileID: 152624350}
+  stopMovementWhenHit: 1
+  ai: {fileID: 152624351}
 --- !u!4 &152624348
 Transform:
   m_ObjectHideFlags: 0
@@ -298,6 +302,7 @@ Transform:
   m_Children:
   - {fileID: 1506047061}
   - {fileID: 1453905808}
+  - {fileID: 1081890178}
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -337,6 +342,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   navMeshAgent: {fileID: 152624349}
   corners: []
+--- !u!114 &152624351
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 152624344}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45394853b531529479120c4c7b226424, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  attackReachMin: 1
+  attackReachMax: 2
+  personalSpace: 0.75
+  detector: {fileID: 1081890176}
+  currentAction: 0
 --- !u!1 &241007624
 GameObject:
   m_ObjectHideFlags: 0
@@ -15631,6 +15653,64 @@ Transform:
   m_Father: {fileID: 1860116650}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 30, y: 0, z: 0}
+--- !u!1 &1081890175
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1081890178}
+  - component: {fileID: 1081890177}
+  - component: {fileID: 1081890176}
+  m_Layer: 10
+  m_Name: HeroDetector
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1081890176
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1081890175}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93f8416a8fa75974dbf0734c13318402, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  heroIsNearby: 0
+--- !u!135 &1081890177
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1081890175}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 8
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!4 &1081890178
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1081890175}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 152624348}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1214697591
 GameObject:
   m_ObjectHideFlags: 0
@@ -16171,7 +16251,7 @@ GameObject:
   - component: {fileID: 1755039830}
   m_Layer: 8
   m_Name: MyHero
-  m_TagString: Untagged
+  m_TagString: Hero
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -16237,7 +16317,7 @@ MonoBehaviour:
   baseAnim: {fileID: 1464747783}
   body: {fileID: 1755039830}
   shadowSprite: {fileID: 1679287132}
-  baseSprite: {fileID: 0}
+  baseSprite: {fileID: 791985164}
   maxLife: 100
   currentLife: 0
   speed: 2
