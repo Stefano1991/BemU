@@ -6,25 +6,22 @@ public class Actor : MonoBehaviour
 {
     public bool isAlive = true;
 
-    [Header("Public References")]
     [Space(15)]
     public Animator baseAnim;
     public Rigidbody body;
     public SpriteRenderer shadowSprite;
     public SpriteRenderer baseSprite;
 
-    [Header("Stats Variables")]
+
     [Space(15)]
     public float maxLife = 100.0f;
     public float currentLife;
     public float speed = 2;
-    public float attackDamage;
 
 
 
     protected Vector3 frontVector;
 
-    [Header("Functionality Variables")]
     [Space(15)]
     public bool isGrounded;
 
@@ -153,7 +150,7 @@ public class Actor : MonoBehaviour
 
     protected virtual void HitActor(Actor actor, Vector3 hitPoint, Vector3 hitVector)
     {
-        actor.TakeDamage(attackDamage,hitVector);
+        actor.TakeDamage(10,hitVector);
     }
 
     public virtual void FaceTarget(Vector3 targetPoint)
