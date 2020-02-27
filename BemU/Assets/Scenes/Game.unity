@@ -282,13 +282,17 @@ MonoBehaviour:
   body: {fileID: 152624345}
   shadowSprite: {fileID: 1453905809}
   baseSprite: {fileID: 1821419812}
-  maxLife: 100
-  currentLife: 0
+  maxLife: 150
+  currentLife: 150
   speed: 2
+  attackDamage: 6
   isGrounded: 0
   walker: {fileID: 152624350}
   stopMovementWhenHit: 1
   ai: {fileID: 152624351}
+  color: 3
+  smokeSprite: {fileID: 739984954}
+  beltSprite: {fileID: 600245593}
 --- !u!4 &152624348
 Transform:
   m_ObjectHideFlags: 0
@@ -14997,7 +15001,7 @@ SpriteRenderer:
   m_SortingLayer: 1
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 3e1d8a085d279f7478fbef84da321c3d, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.86, g: 0.5, b: 0.32, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -15140,7 +15144,7 @@ Light:
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: -2.117583e-22, y: -Infinity, z: 1.6543611e-24, w: 0}
+  m_BoundingSphereOverride: {x: 8.17e-43, y: 1e-45, z: 0, w: 8.25e-43}
   m_UseBoundingSphereOverride: 0
   m_ShadowRadius: 0
   m_ShadowAngle: 0
@@ -15229,7 +15233,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: eaa4d030463441749a751e93e38af814, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.42, g: 0.15, b: 0.1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -16321,6 +16325,7 @@ MonoBehaviour:
   maxLife: 100
   currentLife: 0
   speed: 2
+  attackDamage: 0
   isGrounded: 0
   input: {fileID: 2146851541}
   walkSpeed: 2
@@ -16401,7 +16406,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 38fdc95cd687b274590f356cec3d79c3, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.91, g: 0.7, b: 0, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
