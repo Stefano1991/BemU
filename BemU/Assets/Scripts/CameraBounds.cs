@@ -7,18 +7,26 @@ using UnityEngine;
 public class CameraBounds : MonoBehaviour
 {
 
+    public float offset;
+
     public float minVisibleX;
     public float maxVisibleX;
     private float minValue;
     private float maxValue;
     public float cameraHalfWidth;
 
-    private Camera activeCamera;
+    public Camera activeCamera;
 
     public Transform cameraRoot;
 
     public Transform leftBounds;
     public Transform rightBounds;
+
+    [Header("Game Intro and Ending Animation")]
+    [Space(15)]
+    public Transform introWalkStart;
+    public Transform introWalkEnd;
+    public Transform exitWalkEnd;
 
 
     // Start is called before the first frame update
@@ -39,12 +47,24 @@ public class CameraBounds : MonoBehaviour
         position = rightBounds.localPosition;
         position.x = transform.localPosition.x + cameraHalfWidth;
         rightBounds.localPosition = position;
+
+        position = introWalkStart.transform.localPosition;
+        position.x = transform.localPosition.x - cameraHalfWidth - 2.0f;
+        introWalkStart.transform.localPosition = position;
+
+        position = introWalkEnd.transform.localPosition;
+        position.x = transform.localPosition.x - cameraHalfWidth + 2.0f;
+        introWalkEnd.transform.localPosition = position;
+
+        position = exitWalkEnd.transform.localPosition;
+        position.x = transform.localPosition.x + cameraHalfWidth + 2.0f;
+        exitWalkEnd.transform.localPosition = position;
     }
 
     public void SetXPosition(float x)
     {
         Vector3 trans = cameraRoot.position;
-        trans.x = Mathf.Clamp(x, minValue, maxValue);
+        trans.x = Mathf.Clamp(x + offset, minValue, maxValue);
         cameraRoot.position = trans;
     }
 
@@ -52,5 +72,31 @@ public class CameraBounds : MonoBehaviour
     void Update()
     {
         
+    }
+
+    public void CalculateOffset(float actorPosition)
+    {
+        offset = cameraRoot.position.x - actorPosition;
+        SetXPosition(actorPosition);
+        StartCoroutine(EaseOffset());
+    }
+
+    public IEnumerator EaseOffset()
+    {
+        while(offset != 0)
+        {
+            offset = Mathf.Lerp(offset, 0, 0.1f);
+            if(Mathf.Abs(offset) < 0.05f)
+            {
+                offset = 0;
+            }
+            yield return new WaitForFixedUpdate();
+        }
+    }
+
+    public void EnableBounds(bool isEnabled)
+    {
+        rightBounds.GetComponent<Collider>().enabled = isEnabled;
+        leftBounds.GetComponent<Collider>().enabled = isEnabled;
     }
 }

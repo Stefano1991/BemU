@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class Hero : Actor
 {
@@ -32,6 +33,14 @@ public class Hero : Actor
     float lastAttackTime;
     float attackLimit = 0.14f;
 
+    /// <summary>
+    /// Hero entrance
+    /// </summary>
+    public Walker walker;
+    public bool isAutoPiloting;
+    public bool controllable = true;
+
+
     // Update is called once per frame
     public override void Update()
     {
@@ -46,7 +55,10 @@ public class Hero : Actor
         isJumpLandAnim = baseAnim.GetCurrentAnimatorStateInfo(0).IsName("jump_land");
         isJumpingAnim = baseAnim.GetCurrentAnimatorStateInfo(0).IsName("jump_rise") || baseAnim.GetCurrentAnimatorStateInfo(0).IsName("jump_fall");
 
-
+        if(isAutoPiloting)
+        {
+            return;
+        }
 
         float h = input.GetHorizontalAxis();
         float v = input.GetVerticalAxis();
@@ -99,6 +111,35 @@ public class Hero : Actor
 
     }
 
+   
+
+    private void FixedUpdate()
+    {
+        if (!isAlive)
+        {
+            return;
+        }
+        if (!isAutoPiloting)
+        {
+            Vector3 moveVector = currentDir * speed;
+
+            if (isGrounded && !isAttackingAnim)
+            {
+                body.MovePosition(transform.position + moveVector * Time.fixedDeltaTime);
+                baseAnim.SetFloat("Speed", moveVector.magnitude);
+            }
+
+            if (moveVector != Vector3.zero)
+            {
+                if (moveVector.x != 0)
+                {
+                    isFacingLeft = moveVector.x < 0;
+                }
+                FlipSprite(isFacingLeft);
+            }
+        }
+    }
+
     public void Stop()
     {
         speed = 0;
@@ -123,7 +164,7 @@ public class Hero : Actor
 
     public void Jump(Vector3 direction)
     {
-        if(!isJumpingAnim)
+        if (!isJumpingAnim)
         {
             baseAnim.SetTrigger("Jump");
             lastJumpTime = Time.time;
@@ -143,31 +184,6 @@ public class Hero : Actor
         Run();
     }
 
-    private void FixedUpdate()
-    {
-
-        if(!isAlive)
-        {
-            return;
-        }
-        Vector3 moveVector = currentDir * speed;
-
-        if (isGrounded && !isAttackingAnim)
-        {
-            body.MovePosition(transform.position + moveVector * Time.fixedDeltaTime);
-            baseAnim.SetFloat("Speed", moveVector.magnitude);
-        }
-
-        if (moveVector != Vector3.zero)
-        {
-            if (moveVector.x != 0)
-            {
-                isFacingLeft = moveVector.x < 0;
-            }
-            FlipSprite(isFacingLeft);
-        }
-    }
-
     public override void Attack()
     {
         baseAnim.SetInteger("EvaluatedChain", 0);
@@ -177,5 +193,25 @@ public class Hero : Actor
     public void DidChain(int chain)
     {
         baseAnim.SetInteger("EvaluatedChain", 1);
+    }
+
+
+    public void AnimateTo(Vector3 position, bool shouldRun, Action callback)
+    {
+        if(shouldRun)
+        {
+            Run();
+        } else
+        {
+            Walk();
+        }
+
+        walker.MoveTo(position, callback);
+    }
+
+    public void UseAutopilot(bool useAutopilot)
+    {
+        isAutoPiloting = useAutopilot;
+        walker.enabled = useAutopilot;
     }
 }

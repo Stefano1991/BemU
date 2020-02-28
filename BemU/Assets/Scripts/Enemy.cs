@@ -10,7 +10,7 @@ public class Enemy : Actor
     public static int totalEnemies;
 
 
-    public void ResgusterEnemy()
+    public void RegisterEnemy()
     {
         totalEnemies++;
     }
