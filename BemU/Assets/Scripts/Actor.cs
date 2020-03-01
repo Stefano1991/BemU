@@ -18,9 +18,6 @@ public class Actor : MonoBehaviour
     public float maxLife = 100.0f;
     public float currentLife;
     public float speed = 2;
-    public float attackDamage;
-
-
 
     protected Vector3 frontVector;
 
@@ -37,6 +34,10 @@ public class Actor : MonoBehaviour
     {
         return true;
     }
+
+
+    [Header("Battle Variables")]
+    public AttackData normalAttack;
 
 
     protected virtual void Start()
@@ -153,7 +154,7 @@ public class Actor : MonoBehaviour
 
     protected virtual void HitActor(Actor actor, Vector3 hitPoint, Vector3 hitVector)
     {
-        actor.TakeDamage(attackDamage,hitVector);
+        actor.EvaluateAttackData(normalAttack, hitVector, hitPoint);
     }
 
     public virtual void FaceTarget(Vector3 targetPoint)
@@ -161,7 +162,19 @@ public class Actor : MonoBehaviour
         FlipSprite(transform.position.x - targetPoint.x > 0);
     }
 
+    public virtual void EvaluateAttackData(AttackData data, Vector3 hitVector, Vector3 hitPoint)
+    {
+        body.AddForce(data.force * hitVector);
+        TakeDamage(data.attackDamage, hitVector);
+    }
 }
 
+[System.Serializable]
+public class AttackData
+{
+    public float attackDamage = 10;
+    public float force = 50;
+    public bool knockdown = false;
+}
 
 

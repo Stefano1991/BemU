@@ -911,6 +911,75 @@ Transform:
   m_Father: {fileID: 1755039829}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &1685556838
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 8838497073980545778, guid: ed0be7fed6ec5344ba0ff57d346a03e3,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 8838497073980545778, guid: ed0be7fed6ec5344ba0ff57d346a03e3,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8838497073980545778, guid: ed0be7fed6ec5344ba0ff57d346a03e3,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8838497073980545778, guid: ed0be7fed6ec5344ba0ff57d346a03e3,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8838497073980545778, guid: ed0be7fed6ec5344ba0ff57d346a03e3,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8838497073980545778, guid: ed0be7fed6ec5344ba0ff57d346a03e3,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8838497073980545778, guid: ed0be7fed6ec5344ba0ff57d346a03e3,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8838497073980545778, guid: ed0be7fed6ec5344ba0ff57d346a03e3,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8838497073980545778, guid: ed0be7fed6ec5344ba0ff57d346a03e3,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8838497073980545778, guid: ed0be7fed6ec5344ba0ff57d346a03e3,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8838497073980545778, guid: ed0be7fed6ec5344ba0ff57d346a03e3,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8838497073980545782, guid: ed0be7fed6ec5344ba0ff57d346a03e3,
+        type: 3}
+      propertyPath: m_Name
+      value: EnemyRobot
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: ed0be7fed6ec5344ba0ff57d346a03e3, type: 3}
 --- !u!1 &1755039828
 GameObject:
   m_ObjectHideFlags: 0
@@ -997,8 +1066,11 @@ MonoBehaviour:
   maxLife: 100
   currentLife: 0
   speed: 2
-  attackDamage: 10
   isGrounded: 0
+  normalAttack:
+    attackDamage: 5
+    force: 150
+    knockdown: 0
   input: {fileID: 2146851541}
   walkSpeed: 2
   runSpeed: 5
@@ -1010,6 +1082,12 @@ MonoBehaviour:
   walker: {fileID: 1755039833}
   isAutoPiloting: 0
   controllable: 1
+  canJumpAttack: 1
+  evaluatedAttackChain: 0
+  jumpAttack:
+    attackDamage: 20
+    force: 200
+    knockdown: 0
 --- !u!114 &1755039833
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -5,7 +5,7 @@ using System;
 
 public class Hero : Actor
 {
-
+    [Space(15)]
     public InputHandler input;
 
     public float walkSpeed = 2;
@@ -41,6 +41,14 @@ public class Hero : Actor
     public bool controllable = true;
 
 
+    [Header("Jump Attack")]
+    /// <summary>
+    /// Jump Attack
+    /// </summary>
+    public bool canJumpAttack = true;
+    private int currentAttackChain = 1;
+    public int evaluatedAttackChain = 0;
+    public AttackData jumpAttack;
     // Update is called once per frame
     public override void Update()
     {
@@ -81,6 +89,8 @@ public class Hero : Actor
                 isMoving = true;
                 float dotProduct = Vector3.Dot(currentDir, lastWalkVector);
 
+
+
                 if (canRun && Time.time < lastWalk + tapAgainToRunTime && dotProduct > 0)
                 {
                     Run();
@@ -95,7 +105,14 @@ public class Hero : Actor
                         lastWalk = Time.time;
                     }
                 }
+            } else if (isMoving && Input.GetButton("Run") )
+            {
+                Run();
+            } else if(isMoving && Input.GetButtonUp("Run"))
+            {
+                Walk();
             }
+
         }
 
         if(jump && !isJumpLandAnim && !isAttackingAnim && (isGrounded || (isJumpingAnim && Time.time < lastJumpTime + jumpDuration)))
@@ -140,6 +157,16 @@ public class Hero : Actor
         }
     }
 
+    protected override void OnCollisionEnter(Collision collision)
+    {
+        base.OnCollisionEnter(collision);
+        if(collision.collider.name=="Floor")
+        {
+            canJumpAttack = true;
+        }
+    }
+
+
     public void Stop()
     {
         speed = 0;
@@ -151,7 +178,9 @@ public class Hero : Actor
     public void Walk()
     {
         speed = walkSpeed;
+        isRunning = false;
         baseAnim.SetFloat("Speed", speed);
+        baseAnim.SetBool("isRunning", isRunning);
     }
 
     public void Run()
@@ -181,19 +210,61 @@ public class Hero : Actor
     {
         base.DidLand();
         Walk();
-        Run();
+        //Run();
     }
 
     public override void Attack()
     {
-        baseAnim.SetInteger("EvaluatedChain", 0);
-        baseAnim.SetInteger("CurrentChain", 1);
+
+        if (!isGrounded)
+        {
+            if(isJumpingAnim && canJumpAttack)
+            {
+                canJumpAttack = false;
+                currentAttackChain = 1;
+                evaluatedAttackChain = 0;
+                baseAnim.SetInteger("EvaluatedChain", evaluatedAttackChain);
+                baseAnim.SetInteger("CurrentChain", currentAttackChain);
+
+                body.velocity = Vector3.zero;
+                body.useGravity = false;
+            }
+        } else
+        {
+            currentAttackChain = 1;
+            evaluatedAttackChain = 0;
+            baseAnim.SetInteger("EvaluatedChain", evaluatedAttackChain);
+            baseAnim.SetInteger("CurrentChain", currentAttackChain);
+        }
+    }
+
+    public void AnalyzeSpecialAttack(AttackData attackData, Actor actor, Vector3 hitPoints, Vector3 hitVector)
+    {
+        actor.EvaluateAttackData(attackData, hitVector, hitPoints);
+    }
+
+    protected override void HitActor(Actor actor, Vector3 hitPoint, Vector3 hitVector)
+    {
+        if(baseAnim.GetCurrentAnimatorStateInfo(0).IsName("attack1"))
+        {
+            base.HitActor(actor, hitPoint, hitVector);
+        } else if(baseAnim.GetCurrentAnimatorStateInfo(0).IsName("jump_attack"))
+        {
+            AnalyzeSpecialAttack(jumpAttack, actor, hitPoint, hitVector);
+        }
     }
 
     public void DidChain(int chain)
     {
         baseAnim.SetInteger("EvaluatedChain", 1);
     }
+
+    public void DidJumpAttack()
+    {
+        body.useGravity = true;
+    }
+
+
 
 
     public void AnimateTo(Vector3 position, bool shouldRun, Action callback)
