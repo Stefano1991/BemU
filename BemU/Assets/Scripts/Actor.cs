@@ -27,7 +27,7 @@ public class Actor : MonoBehaviour
 
     public bool CanBeHit()
     {
-        return isAlive;
+        return isAlive && !isKnockedOut;
     }
 
     public virtual bool CanWalk()
@@ -38,6 +38,9 @@ public class Actor : MonoBehaviour
 
     [Header("Battle Variables")]
     public AttackData normalAttack;
+
+    protected Coroutine knockdownRoutine;
+    public bool isKnockedOut;
 
 
     protected virtual void Start()
@@ -98,7 +101,7 @@ public class Actor : MonoBehaviour
         baseAnim.SetTrigger("Attack");
     }
 
-    public virtual void TakeDamage(float value, Vector3 hitVector)
+    public virtual void TakeDamage(float value, Vector3 hitVector, bool knockdown = false)
     {
         FlipSprite(hitVector.x > 0);
         currentLife -= value;
@@ -106,6 +109,14 @@ public class Actor : MonoBehaviour
         if(isAlive && currentLife <= 0)
         {
             Die();
+        } else if (knockdown)
+        {
+            if(knockdownRoutine == null)
+            {
+                Vector3 pushbackVector = (hitVector + Vector3.up * 0.75f).normalized;
+                body.AddForce(pushbackVector * 250);
+                knockdownRoutine = StartCoroutine(KnockdownRoutine());
+            }
         } else
         {
             baseAnim.SetTrigger("isHurt");
@@ -114,6 +125,10 @@ public class Actor : MonoBehaviour
 
     protected virtual void Die()
     {
+        if(knockdownRoutine != null)
+        {
+            StopCoroutine(knockdownRoutine);
+        }
         isAlive = false;
         baseAnim.SetBool("isAlive", isAlive);
         StartCoroutine(DeathFlicker());
@@ -165,7 +180,22 @@ public class Actor : MonoBehaviour
     public virtual void EvaluateAttackData(AttackData data, Vector3 hitVector, Vector3 hitPoint)
     {
         body.AddForce(data.force * hitVector);
-        TakeDamage(data.attackDamage, hitVector);
+        TakeDamage(data.attackDamage, hitVector,data.knockdown);
+    }
+
+
+    public void DidGetUp()
+    {
+        isKnockedOut = false;
+    }
+
+    protected virtual IEnumerator KnockdownRoutine()
+    {
+        isKnockedOut = true;
+        baseAnim.SetTrigger("Knockdown");
+        yield return new WaitForSeconds(1.0f);
+        baseAnim.SetTrigger("GetUp");
+        knockdownRoutine = null;
     }
 }
 

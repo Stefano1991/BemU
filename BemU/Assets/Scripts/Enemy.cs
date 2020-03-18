@@ -41,17 +41,28 @@ public class Enemy : Actor
         walker.StopMovement();
     }
 
-    public override void TakeDamage(float value, Vector3 hitVector)
+    public override void TakeDamage(float value, Vector3 hitVector, bool knockdown = false)
     {
         if(stopMovementWhenHit)
         {
             walker.StopMovement();
         }
-        base.TakeDamage(value, hitVector);
+        base.TakeDamage(value, hitVector, knockdown);
     }
 
     public override bool CanWalk()
     {
-        return !baseAnim.GetCurrentAnimatorStateInfo(0).IsName("hurt");
+        return !baseAnim.GetCurrentAnimatorStateInfo(0).IsName("hurt") && !baseAnim.GetCurrentAnimatorStateInfo(0).IsName("getup");
+    }
+
+    protected override IEnumerator KnockdownRoutine()
+    {
+        isKnockedOut = true;
+        baseAnim.SetTrigger("Knockdown");
+        ai.enabled = true;
+
+        yield return new WaitForSeconds(2.0f);
+
+        knockdownRoutine = null;
     }
 }

@@ -49,6 +49,14 @@ public class Hero : Actor
     private int currentAttackChain = 1;
     public int evaluatedAttackChain = 0;
     public AttackData jumpAttack;
+
+    bool isHurtAnim;
+
+    public override bool CanWalk()
+    {
+        return (isGrounded && !isAttackingAnim && !isJumpLandAnim && !isKnockedOut && !isHurtAnim);
+    }
+
     // Update is called once per frame
     public override void Update()
     {
@@ -59,9 +67,10 @@ public class Hero : Actor
             return;
         }
 
-        isAttackingAnim = baseAnim.GetCurrentAnimatorStateInfo(0).IsName("attack1");
+        isAttackingAnim = baseAnim.GetCurrentAnimatorStateInfo(0).IsName("attack1") || baseAnim.GetCurrentAnimatorStateInfo(0).IsName("jump_attack");
         isJumpLandAnim = baseAnim.GetCurrentAnimatorStateInfo(0).IsName("jump_land");
         isJumpingAnim = baseAnim.GetCurrentAnimatorStateInfo(0).IsName("jump_rise") || baseAnim.GetCurrentAnimatorStateInfo(0).IsName("jump_fall");
+        isHurtAnim = baseAnim.GetCurrentAnimatorStateInfo(0).IsName("hurt");
 
         if(isAutoPiloting)
         {
@@ -115,12 +124,12 @@ public class Hero : Actor
 
         }
 
-        if(jump && !isJumpLandAnim && !isAttackingAnim && (isGrounded || (isJumpingAnim && Time.time < lastJumpTime + jumpDuration)))
+        if(jump && !isKnockedOut && !isHurtAnim && !isJumpLandAnim && !isAttackingAnim && (isGrounded || (isJumpingAnim && Time.time < lastJumpTime + jumpDuration)))
         {
             Jump(currentDir);
         }
 
-        if(attack && Time.time >= lastAttackTime + attackLimit)
+        if(attack && Time.time >= lastAttackTime + attackLimit && !isKnockedOut)
         {
             lastAttackTime = Time.time;
             Attack();
@@ -140,13 +149,13 @@ public class Hero : Actor
         {
             Vector3 moveVector = currentDir * speed;
 
-            if (isGrounded && !isAttackingAnim)
+            if (isGrounded && !isAttackingAnim && !isJumpLandAnim && !isKnockedOut && !isHurtAnim)
             {
                 body.MovePosition(transform.position + moveVector * Time.fixedDeltaTime);
                 baseAnim.SetFloat("Speed", moveVector.magnitude);
             }
 
-            if (moveVector != Vector3.zero)
+            if (moveVector != Vector3.zero && isGrounded && !isKnockedOut && !isAttackingAnim)
             {
                 if (moveVector.x != 0)
                 {
@@ -284,5 +293,20 @@ public class Hero : Actor
     {
         isAutoPiloting = useAutopilot;
         walker.enabled = useAutopilot;
+    }
+
+    public override void TakeDamage(float value, Vector3 hitVector, bool knockdown = false)
+    {
+        if(!isGrounded)
+        {
+            knockdown = true;
+        }
+        base.TakeDamage(value, hitVector, knockdown);
+    }
+
+    protected override IEnumerator KnockdownRoutine()
+    {
+        body.useGravity = true;
+        return base.KnockdownRoutine();
     }
 }
